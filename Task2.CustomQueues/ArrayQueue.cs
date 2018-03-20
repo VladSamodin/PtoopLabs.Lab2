@@ -52,7 +52,7 @@ namespace Task2.CustomQueues
             {
                 head = 0;
             }
-            if ((tail + 1) % items.Length == head)
+            else if ((tail + 1) % items.Length == head)
             {
                 GrowArray();
             }
@@ -67,6 +67,7 @@ namespace Task2.CustomQueues
                 throw new InvalidOperationException("Queue is empty");
             }
             T dequeueValue = items[head];
+            items[head] = default(T);
             if (head == tail)
             {
                 head = -1;
@@ -90,7 +91,9 @@ namespace Task2.CustomQueues
 
         public void Clear()
         {
+            Array.Clear(items, 0, items.Length);
             head = -1;
+            tail = -1;
         }
 
         public IEnumerator<T> GetEnumerator() => new CustomIterator(this);
@@ -99,7 +102,19 @@ namespace Task2.CustomQueues
 
         private void GrowArray()
         {
-            Array.Resize<T>(ref items, items.Length * 2);
+            var newItemArray = new T[items.Length * 2];
+            if (head == 0)
+            {
+                Array.Copy(items, head, newItemArray, 0, items.Length);
+            }
+            else
+            {
+                Array.Copy(items, head, newItemArray, 0, items.Length - head);
+                Array.Copy(items, 0, newItemArray, items.Length - head, head);
+            }
+            head = 0;
+            tail = items.Length - 1;
+            items = newItemArray;
         }
 
         private class CustomIterator : IEnumerator<T>
