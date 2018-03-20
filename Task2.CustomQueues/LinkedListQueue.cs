@@ -6,10 +6,9 @@ namespace Task2.CustomQueues
     public class LinkedListQueue<T> : IEnumerable<T>
     {
         private Node head;
-
         private Node tail;
-
         private int count;
+        private int version;
 
         public int Count => count;
 
@@ -41,6 +40,7 @@ namespace Task2.CustomQueues
                 tail = newNode;
             }
             count++;
+            version++;
         }
 
         public T Dequeue()
@@ -54,6 +54,7 @@ namespace Task2.CustomQueues
 
             head = head.Next;
             count--;
+            version++;
 
             return dequeueValue;
         }
@@ -72,9 +73,10 @@ namespace Task2.CustomQueues
             head = null;
             tail = null;
             count = 0;
+            version++;
         }
 
-        public IEnumerator<T> GetEnumerator() => new CustomIterator(head);
+        public IEnumerator<T> GetEnumerator() => new CustomIterator(this);
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -87,12 +89,14 @@ namespace Task2.CustomQueues
 
         private class CustomIterator : IEnumerator<T>
         {
-            private Node head;
+            private LinkedListQueue<T> queue;
             private Node currentNode;
+            private int version;
 
-            public CustomIterator(Node head)
+            public CustomIterator(LinkedListQueue<T> queue)
             {
-                this.head = head;
+                this.queue = queue;
+                version = queue.version;
                 currentNode = null;
             }
 
@@ -114,15 +118,22 @@ namespace Task2.CustomQueues
 
             public bool MoveNext()
             {
+                if (version != queue.version)
+                {
+                    throw new InvalidOperationException("The queue was modified.");
+                }
+
+                if (queue.head == null)
+                {
+                    return false;
+                }
+
                 if (currentNode == null)
                 {
-                    if (head == null)
-                    {
-                        return false;
-                    }
-                    currentNode = head;
+                    currentNode = queue.head;
                     return true;
                 }
+
                 if (currentNode.Next == null)
                 {
                     return false;

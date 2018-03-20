@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Task2.CustomQueues
@@ -9,6 +10,7 @@ namespace Task2.CustomQueues
         private T[] items;
         private int head;
         private int tail;
+        private int version;
 
         public int Count
         {
@@ -58,6 +60,7 @@ namespace Task2.CustomQueues
             }
             tail = (tail + 1) % items.Length;
             items[tail] = toAdd;
+            version++;
         }
 
         public T Dequeue()
@@ -77,6 +80,7 @@ namespace Task2.CustomQueues
             {
                 head = (head + 1) % items.Length;
             }
+            version++;
             return dequeueValue;
         }
 
@@ -94,11 +98,12 @@ namespace Task2.CustomQueues
             Array.Clear(items, 0, items.Length);
             head = -1;
             tail = -1;
+            version++;
         }
 
         public IEnumerator<T> GetEnumerator() => new CustomIterator(this);
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         private void GrowArray()
         {
@@ -121,10 +126,12 @@ namespace Task2.CustomQueues
         {
             private readonly ArrayQueue<T> queue;
             private int currentShift;
+            private int version;
 
             public CustomIterator(ArrayQueue<T> queue)
             {
                 currentShift = -1;
+                version = queue.version;
                 this.queue = queue;
             }
 
@@ -147,6 +154,11 @@ namespace Task2.CustomQueues
 
             public bool MoveNext()
             {
+                if (version != queue.version)
+                {
+                    throw new InvalidOperationException("The queue was modified.");
+                }
+
                 if (currentShift + 1 == queue.Count)
                 {
                     return false;
