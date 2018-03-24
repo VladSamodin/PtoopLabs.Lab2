@@ -48,7 +48,7 @@ namespace Task2.CustomQueues
         }
 
 
-        public void Enqueue(T toAdd)
+        public void Enqueue(T value)
         {
             if (this.Empty)
             {
@@ -59,8 +59,25 @@ namespace Task2.CustomQueues
                 GrowArray();
             }
             tail = (tail + 1) % items.Length;
-            items[tail] = toAdd;
+            items[tail] = value;
             version++;
+        }
+
+        private void GrowArray()
+        {
+            var newItemArray = new T[items.Length * 2];
+            if (head == 0)
+            {
+                Array.Copy(items, head, newItemArray, 0, items.Length);
+            }
+            else
+            {
+                Array.Copy(items, head, newItemArray, 0, items.Length - head);
+                Array.Copy(items, 0, newItemArray, items.Length - head, head);
+            }
+            head = 0;
+            tail = items.Length - 1;
+            items = newItemArray;
         }
 
         public T Dequeue()
@@ -104,23 +121,6 @@ namespace Task2.CustomQueues
         public IEnumerator<T> GetEnumerator() => new CustomIterator(this);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        private void GrowArray()
-        {
-            var newItemArray = new T[items.Length * 2];
-            if (head == 0)
-            {
-                Array.Copy(items, head, newItemArray, 0, items.Length);
-            }
-            else
-            {
-                Array.Copy(items, head, newItemArray, 0, items.Length - head);
-                Array.Copy(items, 0, newItemArray, items.Length - head, head);
-            }
-            head = 0;
-            tail = items.Length - 1;
-            items = newItemArray;
-        }
 
         private class CustomIterator : IEnumerator<T>
         {

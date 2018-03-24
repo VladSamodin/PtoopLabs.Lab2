@@ -21,11 +21,11 @@ namespace Task2.CustomQueues
             count = 0;
         }
 
-        public void Enqueue(T toAdd)
+        public void Enqueue(T value)
         {
             var newNode = new Node
             {
-                 Data = toAdd,
+                 Value = value,
                  Next = null
             };
 
@@ -50,7 +50,7 @@ namespace Task2.CustomQueues
                 throw new InvalidOperationException("Queue is empty");
             }
 
-            T dequeueValue = head.Data;
+            T dequeueValue = head.Value;
 
             head = head.Next;
             count--;
@@ -65,7 +65,7 @@ namespace Task2.CustomQueues
             {
                 throw new InvalidOperationException("Queue is empty");
             }
-            return head.Data;
+            return head.Value;
         }
 
         public void Clear()
@@ -82,7 +82,7 @@ namespace Task2.CustomQueues
 
         private class Node
         {
-            public T Data { get; set; }
+            public T Value { get; set; }
 
             public Node Next { get; set; }
         }
@@ -108,7 +108,7 @@ namespace Task2.CustomQueues
                     {
                         throw new InvalidOperationException();
                     }
-                    return currentNode.Data;
+                    return currentNode.Value;
                 }
             }
 
