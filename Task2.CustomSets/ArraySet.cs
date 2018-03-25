@@ -6,35 +6,61 @@ using System.Linq;
 namespace Task2.CustomSets
 {
     public class ArraySet<T> : IEnumerable<T> 
-        where T : class, IComparable<T>
+        where T : class
     {
         public const int DefaultCapacity = 10;
 
         private T[] items;
         private int count;
+        private IComparer<T> comparer;
 
         public int Count => count;
 
         public int Capacity => items.Length;
 
+        private ArraySet(T[] sortedArray, int count, IComparer<T> comparer)
+        {
+            items = sortedArray;
+            this.count = count;
+            this.comparer = comparer;
+        }
+
         public ArraySet()
         {
             count = 0;
             items = new T[DefaultCapacity];
+            this.comparer = Comparer<T>.Default;
+        }
+
+        public ArraySet(IComparer<T> comparer)
+        {
+            count = 0;
+            items = new T[DefaultCapacity];
+            this.comparer = comparer;
         }
 
         public ArraySet(ArraySet<T> set)
         {
             count = set.count;
             items = new T[set.Capacity];
+            this.comparer = set.comparer;
 
             Array.Copy(set.items, items, set.Count);
         }
 
         public ArraySet(IEnumerable<T> collection)
         {
+            this.comparer = Comparer<T>.Default;
             items = collection.ToArray();
-            Array.Sort(items);
+            Array.Sort(items, comparer);
+            count = items.Length;
+        }
+
+        public ArraySet(IEnumerable<T> collection, IComparer<T> comparer)
+        {
+            this.comparer = comparer;
+            items = collection.ToArray();
+            Array.Sort(items, comparer);
             count = items.Length;
         }
 
@@ -60,7 +86,7 @@ namespace Task2.CustomSets
 
         private int BinarySearch(T value)
         {
-            return Array.BinarySearch(items, 0, count, value);
+            return Array.BinarySearch(items, 0, count, value, comparer);
         }
 
         private void InsertValue(int index, T value)
@@ -135,8 +161,10 @@ namespace Task2.CustomSets
                 return new ArraySet<T>(this);
             }
 
-            var union = new ArraySet<T>(); 
-            union.items = GenerateUnionArray(anotherSet, out union.count);
+            int unionCount;
+            var unionArray = GenerateUnionArray(anotherSet, out unionCount);
+
+            var union = new ArraySet<T>(unionArray, unionCount, comparer);
 
             return union;
         }
@@ -151,12 +179,11 @@ namespace Task2.CustomSets
 
             while (thisSetIndex < Count && anotherSetIndex < anotherSet.Count)
             {
-                var compareResult = items[thisSetIndex].CompareTo(anotherSet.items[anotherSetIndex]);
+                var compareResult = comparer.Compare(items[thisSetIndex], anotherSet.items[anotherSetIndex]);
 
                 if (compareResult > 0)
                 {
                     unionArray[nextIndex++] = items[thisSetIndex++];
-                    
                 }
                 else if (compareResult < 0)
                 {
@@ -206,7 +233,7 @@ namespace Task2.CustomSets
             var startIndex = 0;
             foreach (var item in this)
             {
-                var index = Array.BinarySearch(anotherSet.items, startIndex, anotherSet.Count - startIndex, item);
+                var index = Array.BinarySearch(anotherSet.items, startIndex, anotherSet.Count - startIndex, item, comparer);
                 if (index >= 0)
                 {
                     intersectionList.Add(item);
@@ -218,9 +245,7 @@ namespace Task2.CustomSets
                 }
             }
 
-            var intersection = new ArraySet<T>();
-            intersection.items = intersectionList.ToArray();
-            intersection.count = intersectionList.Count;
+            var intersection = new ArraySet<T>(intersectionList.ToArray(), intersectionList.Count, comparer);
 
             return intersection;
         }
@@ -241,7 +266,7 @@ namespace Task2.CustomSets
             var startIndex = 0;
             foreach (var item in this)
             {
-                var index = Array.BinarySearch(anotherSet.items, startIndex, anotherSet.Count - startIndex, item);
+                var index = Array.BinarySearch(anotherSet.items, startIndex, anotherSet.Count - startIndex, item, comparer);
                 if (index >= 0)
                 {
                     startIndex = index;
@@ -253,9 +278,7 @@ namespace Task2.CustomSets
                 }
             }
 
-            var difference = new ArraySet<T>();
-            difference.items = differenceList.ToArray();
-            difference.count = differenceList.Count;
+            var difference = new ArraySet<T>(differenceList.ToArray(), differenceList.Count, comparer);
 
             return difference;
         }
@@ -275,7 +298,7 @@ namespace Task2.CustomSets
             var startIndex = 0;
             foreach (var item in this)
             {
-                var index = Array.BinarySearch(anotherSet.items, startIndex, anotherSet.Count - startIndex, item);
+                var index = Array.BinarySearch(anotherSet.items, startIndex, anotherSet.Count - startIndex, item, comparer);
                 if (index >= 0)
                 {
                     startIndex = index;
