@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayQueue.cs" />
+    <Compile Include="IEnumerableQueue.cs" />
     <Compile Include="IQueue.cs" />
     <Compile Include="LinkedListQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

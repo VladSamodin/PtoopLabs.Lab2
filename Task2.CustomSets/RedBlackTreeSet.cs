@@ -80,7 +80,7 @@ namespace Task2.CustomSets
             return new RedBlackTreeSet<T>(unionTree, comparer);
         }
 
-        public RedBlackTreeSet<T> Intersection(RedBlackTreeSet<T> anotherSet)
+        public RedBlackTreeSet<T> Intersect(RedBlackTreeSet<T> anotherSet)
         {
             if (anotherSet == null)
             {

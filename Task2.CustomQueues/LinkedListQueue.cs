@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Task2.CustomQueues
 {
-    public class LinkedListQueue<T> : IQueue<T>, IEnumerable<T>
+    public class LinkedListQueue<T> : IEnumerableQueue<T>
     {
         private Node head;
         private Node tail;

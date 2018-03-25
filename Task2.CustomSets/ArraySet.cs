@@ -218,7 +218,7 @@ namespace Task2.CustomSets
             return unionArray;
         }
 
-        public ArraySet<T> Intersection(ArraySet<T> anotherSet)
+        public ArraySet<T> Intersect(ArraySet<T> anotherSet)
         {
             if (anotherSet == null)
             {
