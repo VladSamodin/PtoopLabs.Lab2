@@ -6,15 +6,16 @@ using System.Linq;
 namespace Task2.CustomSets
 {
     public class ArraySet<T> : IEnumerable<T> 
-        where T : class
     {
         public const int DefaultCapacity = 10;
 
         private T[] items;
         private int count;
-        private IComparer<T> comparer;
+        private readonly IComparer<T> comparer;
 
         public int Count => count;
+
+        public bool Empty => count == 0;
 
         public int Capacity => items.Length;
 
@@ -151,12 +152,12 @@ namespace Task2.CustomSets
                 throw new ArgumentNullException(nameof(anotherSet));
             }
 
-            if (this.Count == 0)
+            if (this.Empty)
             {
                 return new ArraySet<T>(anotherSet);
             }
 
-            if (anotherSet.Count == 0)
+            if (anotherSet.Empty)
             {
                 return new ArraySet<T>(this);
             }
@@ -181,11 +182,11 @@ namespace Task2.CustomSets
             {
                 var compareResult = comparer.Compare(items[thisSetIndex], anotherSet.items[anotherSetIndex]);
 
-                if (compareResult > 0)
+                if (compareResult < 0)
                 {
                     unionArray[nextIndex++] = items[thisSetIndex++];
                 }
-                else if (compareResult < 0)
+                else if (compareResult > 0)
                 {
                     unionArray[nextIndex++] = anotherSet.items[anotherSetIndex++];
                 }
@@ -224,7 +225,7 @@ namespace Task2.CustomSets
                 throw new ArgumentNullException(nameof(anotherSet));
             }
 
-            if (anotherSet.Count == 0)
+            if (anotherSet.Empty)
             {
                 return new ArraySet<T>();
             }
@@ -257,7 +258,7 @@ namespace Task2.CustomSets
                 throw new ArgumentNullException(nameof(anotherSet));
             }
 
-            if (anotherSet.Count == 0)
+            if (anotherSet.Empty)
             {
                 return new ArraySet<T>(this);
             }
@@ -290,9 +291,14 @@ namespace Task2.CustomSets
                 throw new ArgumentNullException(nameof(anotherSet));
             }
 
-            if (Count == 0)
+            if (this.Empty)
             {
                 return true;
+            }
+
+            if (this.Count > anotherSet.Count)
+            {
+                return false;
             }
 
             var startIndex = 0;

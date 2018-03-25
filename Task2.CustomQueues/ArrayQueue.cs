@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Task2.CustomQueues
 {
-    public class ArrayQueue<T> : IEnumerable<T>
+    public class ArrayQueue<T> : IQueue<T>, IEnumerable<T>
     {
         private const int MinCapacity = 10;
         private T[] items;

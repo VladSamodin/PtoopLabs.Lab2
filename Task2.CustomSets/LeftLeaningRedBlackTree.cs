@@ -14,7 +14,7 @@ namespace Task2.CustomSets
     /// http://www.cs.princeton.edu/~rs/talks/LLRB/08Penn.pdf
     /// </remarks>
     /// <typeparam name="TKey">Type of keys.</typeparam>
-    public class LeftLeaningRedBlackTree<TKey>
+    internal class LeftLeaningRedBlackTree<TKey>
     {
         /// <summary>
         /// Stores the key comparison function.
@@ -53,8 +53,22 @@ namespace Task2.CustomSets
             /// Gets or sets the color of the node.
             /// </summary>
             public bool IsBlack;
+
+            public Node(TKey key)
+            {
+                this.Key = key;
+            }
+
+            public Node(TKey key, bool isRed)
+            {
+                this.Key = key;
+                this.IsBlack = !isRed;
+            }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the LeftLeaningRedBlackTree class implementing a normal dictionary.
+        /// </summary>
         public LeftLeaningRedBlackTree()
         {
             this.comparer = Comparer<TKey>.Default;
@@ -67,6 +81,70 @@ namespace Task2.CustomSets
         public LeftLeaningRedBlackTree(IComparer<TKey> comparer)
         {
             this.comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+        }
+
+        public LeftLeaningRedBlackTree(TKey[] array, int startIndex, int endIndex, IComparer<TKey> comparer)
+        {
+            if (array == null)
+            {
+                throw new ArgumentNullException(nameof(array));
+            }
+            this.comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            root = ConstructTreeFromSortedArray(array, startIndex, endIndex, null);
+        }
+
+        private Node ConstructTreeFromSortedArray(TKey[] array, int startIndex, int endIndex, Node redNode)
+        {
+            int size = endIndex - startIndex + 1;
+            if (size == 0)
+            {
+                return null;
+            }
+            Node root = null;
+            if (size == 1)
+            {
+                root = new Node(array[startIndex], false);
+                if (redNode != null)
+                {
+                    root.Left = redNode;
+                }
+            }
+            else if (size == 2)
+            {
+                root = new Node(array[startIndex], false);
+                root.Right = new Node(array[endIndex], false);
+                root.Right.IsBlack = false;
+                if (redNode != null)
+                {
+                    root.Left = redNode;
+                }
+            }
+            else if (size == 3)
+            {
+                root = new Node(array[startIndex + 1], false);
+                root.Left = new Node(array[startIndex], false);
+                root.Right = new Node(array[endIndex], false);
+                if (redNode != null)
+                {
+                    root.Left.Left = redNode;
+                }
+            }
+            else
+            {
+                int middle = (startIndex + endIndex) / 2;
+                root = new Node(array[middle], false);
+                root.Left = ConstructTreeFromSortedArray(array, startIndex, middle - 1, redNode);
+                if (size % 2 == 0)
+                {
+                    root.Right = ConstructTreeFromSortedArray(array, middle + 2, endIndex, new Node(array[middle + 1], true));
+                }
+                else
+                {
+                    root.Right = ConstructTreeFromSortedArray(array, middle + 1, endIndex, null);
+                }
+            }
+            return root;
+
         }
 
         /// <summary>
@@ -176,7 +254,7 @@ namespace Task2.CustomSets
             {
                 // Insert new node
                 Count++;
-                return new Node { Key = key };
+                return new Node(key);
             }
 
             if (IsRed(node.Left) && IsRed(node.Right))
@@ -281,6 +359,11 @@ namespace Task2.CustomSets
 
             // Maintain invariants
             return FixUp(node);
+        }
+
+        public bool Contains(TKey key)
+        {
+            return GetNodeForKey(key) != null;
         }
 
         /// <summary>
