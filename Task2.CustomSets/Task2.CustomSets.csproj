@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArraySet.cs" />
-    <Compile Include="RedBlackTree.cs" />
+    <Compile Include="LeftLeaningRedBlackTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedBlackTreeSet.cs" />
   </ItemGroup>
