@@ -59,10 +59,10 @@ namespace Task2.CustomSets
                 this.Key = key;
             }
 
-            public Node(TKey key, bool isRed)
+            public Node(TKey key, bool isBlack)
             {
                 this.Key = key;
-                this.IsBlack = !isRed;
+                this.IsBlack = isBlack;
             }
         }
 
@@ -103,7 +103,7 @@ namespace Task2.CustomSets
             Node root = null;
             if (size == 1)
             {
-                root = new Node(array[startIndex], false);
+                root = new Node(array[startIndex], true);
                 if (redNode != null)
                 {
                     root.Left = redNode;
@@ -111,8 +111,8 @@ namespace Task2.CustomSets
             }
             else if (size == 2)
             {
-                root = new Node(array[startIndex], false);
-                root.Right = new Node(array[endIndex], false);
+                root = new Node(array[startIndex], true);
+                root.Right = new Node(array[endIndex], true);
                 root.Right.IsBlack = false;
                 if (redNode != null)
                 {
@@ -121,9 +121,9 @@ namespace Task2.CustomSets
             }
             else if (size == 3)
             {
-                root = new Node(array[startIndex + 1], false);
-                root.Left = new Node(array[startIndex], false);
-                root.Right = new Node(array[endIndex], false);
+                root = new Node(array[startIndex + 1], true);
+                root.Left = new Node(array[startIndex], true);
+                root.Right = new Node(array[endIndex], true);
                 if (redNode != null)
                 {
                     root.Left.Left = redNode;
@@ -132,11 +132,11 @@ namespace Task2.CustomSets
             else
             {
                 int middle = (startIndex + endIndex) / 2;
-                root = new Node(array[middle], false);
+                root = new Node(array[middle], true);
                 root.Left = ConstructTreeFromSortedArray(array, startIndex, middle - 1, redNode);
                 if (size % 2 == 0)
                 {
-                    root.Right = ConstructTreeFromSortedArray(array, middle + 2, endIndex, new Node(array[middle + 1], true));
+                    root.Right = ConstructTreeFromSortedArray(array, middle + 2, endIndex, new Node(array[middle + 1]));
                 }
                 else
                 {
@@ -144,7 +144,6 @@ namespace Task2.CustomSets
                 }
             }
             return root;
-
         }
 
         /// <summary>
